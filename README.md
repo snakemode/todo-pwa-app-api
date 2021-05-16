@@ -33,6 +33,7 @@ An API built for a teaching class
 
 - add dependencies
     - npm install express --save
+    - npm install body-parser --save
     - npm install nodemon --save-dev
     - explain express to students
     - explain that nodemon restarts your node application whenever we change a file
@@ -70,11 +71,11 @@ Our HTTP API is going to be a webserver that looks like this:
 GET - /todos - returns todo list
 POST - /todos - saves whole todo list.
 
-The API will return, and expect the following JSON:
+The API will return, and expect the following JSON array:
 
 [
-    { value: "My item" },
-    { value: "My other item" },
+    { "value": "My item" },
+    { "value": "My other item" },
 ]
 
 We're going to use a `HTTP header` to supply an `apiKey` (to let you access the API) and an `accountId` (so you know which list you're saving).
@@ -103,15 +104,95 @@ Req contains information from the incoming request, and res is the "response obj
 
 ```js
 app.get('/todo', (req, res) => {
-
-    res.header('content-type', 'application/json');
-    res.send([
-        { value: "My item" },
-        { value: "My other item" },
+    res.json([
+        { "value": "My item" },
+        { "value": "My other item" },
     ]);
-
 });
 ```
 
 - We can now look at this in our browser and see that we've got a webserver that can send JSON data to our browsers!
     - Visit http://localhost:3000/todo to see.
+
+- Instead of just having a hardcoded variable to return todo items to our users, lets move our data to a variable that lives in the memory of our webserver.
+
+```js
+let  savedData = [
+    { "value": "My item" },
+    { "value": "My other item" },
+];
+
+app.get('/todo', (req, res) => {
+    res.json(savedData);
+});
+```
+
+- By moving our code into a variable, we can make our GET api a little simpler
+
+- Now let's add our POST api
+    - First, add a require for body-parser on line 2
+    - add an app.use for bodyParser to enable body parsing after our port definition.
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+```
+
+- We're now setup to receive json data
+
+```js
+app.post('/todo', (req, res) => {
+    savedData = req.body;
+    res.end();
+});
+```
+
+- This function will take ANY json posted to it, and assign it to our savedData variable.
+- If we post data to our /todo endpoint with the content-type of application/json, it'll be saved in memory.
+
+- This is kind of "fine" for a demo, but obviously only supports a single todo list!
+- The data also vanishes whenever we restart the server!
+
+- Let's use our local file system to store data instead.
+- Instead of storing everything in memory let's use the node "fs" package to store our data in a file, and load it from a file.
+
+- We'll need to add a require for another node built in package called 'fs' - short for "file system".
+
+```js
+const express = require('express');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+
+const app = express();
+const port = 3000;
+```
+
+- Now we can read and save to files on our computer.
+
+```js
+app.get('/todo', (req, res) => {
+    let savedData = [];
+
+    if (fs.existsSync("./data.json")) {
+        const fileData = fs.readFileSync("./data.json", { encoding: "utf-8" });
+        savedData = JSON.parse(fileData);
+    }
+
+    res.json(savedData);
+});
+
+app.post('/todo', (req, res) => {
+    fs.writeFileSync("./data.json", JSON.stringify(req.body));
+    res.end();
+});
+```
+
+- Here we're saving a file to the `file system` called `data.json`, and we're "stringifying" it to save - converting it to text, and "parsing it" converting it back to JavaScript objects - when we load it.
+
+This is cool, because our data now survives us restarting the server!
+- In a real application, we'd probably use a database or some other kind of storage to store our data.
