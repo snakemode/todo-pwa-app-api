@@ -33,7 +33,6 @@ app.get('/todo', (req, res) => {
 
 app.post('/todo', (req, res) => {
     const userId = req.headers["userid"];
-    console.log(req.headers);
     const dataFileName = `./data.${userId}.json`;
 
     if (!userId) {
