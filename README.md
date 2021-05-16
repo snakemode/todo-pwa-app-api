@@ -196,3 +196,51 @@ app.post('/todo', (req, res) => {
 
 This is cool, because our data now survives us restarting the server!
 - In a real application, we'd probably use a database or some other kind of storage to store our data.
+
+- If we have multiple users, we might want to use a HTTP header to tell them appart
+    - Headers are commonly used to add things like API keys for authentication
+    - In our example, we'll support multiple users by adding a HTTP header to identify our user.
+    - We'll modify the GET function to look for a header
+    - We'll modify the POST function to save to a file using that header value as it's name.
+
+```js
+
+app.get('/todo', (req, res) => {
+    const userId = req.headers["userid"];
+    const dataFileName = `./data.${userId}.json`;
+
+    if (!userId) {
+        res.statusCode = 401;
+        res.end();
+        return;
+    }
+
+    let savedData = [];
+
+    if (fs.existsSync(dataFileName)) {
+        const fileData = fs.readFileSync(dataFileName, { encoding: "utf-8" });
+        savedData = JSON.parse(fileData);
+    }
+
+    res.json(savedData);
+});
+
+app.post('/todo', (req, res) => {
+    const userId = req.headers["userid"];
+    console.log(req.headers);
+    const dataFileName = `./data.${userId}.json`;
+
+    if (!userId) {
+        res.statusCode = 401;
+        res.end();
+        return;
+    }
+
+    fs.writeFileSync(dataFileName, JSON.stringify(req.body));
+    res.end();
+});
+```
+
+- We're now trying to read `userid` from the headers collection, and our APIs will only work if a `userid` is present.
+
+- We're also going to save to a data file per user, so users can have their own todo lists!

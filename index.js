@@ -12,10 +12,19 @@ app.get('/', (req, res) => {
 });
 
 app.get('/todo', (req, res) => {
+    const userId = req.headers["userid"];
+    const dataFileName = `./data.${userId}.json`;
+
+    if (!userId) {
+        res.statusCode = 401;
+        res.end();
+        return;
+    }
+
     let savedData = [];
 
-    if (fs.existsSync("./data.json")) {
-        const fileData = fs.readFileSync("./data.json", { encoding: "utf-8" });
+    if (fs.existsSync(dataFileName)) {
+        const fileData = fs.readFileSync(dataFileName, { encoding: "utf-8" });
         savedData = JSON.parse(fileData);
     }
 
@@ -23,7 +32,17 @@ app.get('/todo', (req, res) => {
 });
 
 app.post('/todo', (req, res) => {
-    fs.writeFileSync("./data.json", JSON.stringify(req.body));
+    const userId = req.headers["userid"];
+    console.log(req.headers);
+    const dataFileName = `./data.${userId}.json`;
+
+    if (!userId) {
+        res.statusCode = 401;
+        res.end();
+        return;
+    }
+
+    fs.writeFileSync(dataFileName, JSON.stringify(req.body));
     res.end();
 });
 
