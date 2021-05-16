@@ -1,0 +1,23 @@
+{
+  "name": "todo-pwa-app-api",
+  "version": "1.0.0",
+  "description": "An API to store TODOs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snakemode/todo-pwa-app-api.git"
+  },
+  "author": "Jo Franchetti, David Whitney",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/snakemode/todo-pwa-app-api/issues"
+  },
+  "homepage": "https://github.com/snakemode/todo-pwa-app-api#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
