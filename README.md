@@ -33,7 +33,9 @@ An API built for a teaching class
 
 - add dependencies
     - npm install express --save
+    - npm install nodemon --save-dev
     - explain express to students
+    - explain that nodemon restarts your node application whenever we change a file
 
 Replace index.js with express hello world:
 
@@ -51,9 +53,65 @@ app.listen(port, () => {
 });
 ```
 
+- Edit npm run start to
+    - nodemon index.js
+
 - Type NPM run start
     - watch as webserver starts and console logs
     - visit it in a browser on http://localhost:3000;
 
 - Yay, we have a webserver, EVERYTHING on the web is served from web servers.
 - APIs are just web servers that return data, rather than web pages.
+
+- Let's design our API!
+
+Our HTTP API is going to be a webserver that looks like this:
+
+GET - /todos - returns todo list
+POST - /todos - saves whole todo list.
+
+The API will return, and expect the following JSON:
+
+[
+    { value: "My item" },
+    { value: "My other item" },
+]
+
+We're going to use a `HTTP header` to supply an `apiKey` (to let you access the API) and an `accountId` (so you know which list you're saving).
+`GET` and `POST` are both `HTTP Request Methods` - part of the `Hyper Text Transfer protocol` - or `HTTP` for short.
+
+- Adding our todo apis
+
+Let's add our two API endpoints to our index.js file:
+
+```js
+app.get('/todo', (req, res) => {
+
+});
+
+app.post('/todo', (req, res) => {
+
+});
+```
+
+This is how you add a new `route` in `express.js` - we're telling the framework to respond to HTTP requests for `get` and `post` to `/todo`.
+When those requests are received by the webserver, the code in the arrow function will be executed.
+We're provided with the `req` and `res` JavaScript objects.
+Req contains information from the incoming request, and res is the "response object" that we can add data to to send it back to the caller (often a users browser!).
+
+- Let's update our GET function to return some hard-coded "todo" items
+
+```js
+app.get('/todo', (req, res) => {
+
+    res.header('content-type', 'application/json');
+    res.send([
+        { value: "My item" },
+        { value: "My other item" },
+    ]);
+
+});
+```
+
+- We can now look at this in our browser and see that we've got a webserver that can send JSON data to our browsers!
+    - Visit http://localhost:3000/todo to see.
